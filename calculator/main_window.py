@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QMainWindow, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QMainWindow, QMessageBox, QVBoxLayout, QWidget
 
 
 class MainWindow(QMainWindow):
@@ -13,7 +13,7 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(self.cw)
 
-        self.setWindowTitle("PyCalc")
+        self.setWindowTitle("Amo Minha Mulher")
 
     def adjustFixedSize(self):
         self.adjustSize()
@@ -21,3 +21,6 @@ class MainWindow(QMainWindow):
 
     def addWidgetToVLayout(self, widget: QWidget):
         self.vLayout.addWidget(widget)
+
+    def makeMsgBox(self):
+        return QMessageBox(self)

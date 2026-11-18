@@ -9,6 +9,7 @@ from variables import MEDIUM_FONT_SIZE
 if TYPE_CHECKING:
     from display import Display
     from info import Info
+    from main_window import MainWindow
 
 
 class Button(QPushButton):
@@ -24,7 +25,9 @@ class Button(QPushButton):
 
 
 class ButtonsGrid(QGridLayout):
-    def __init__(self, display: "Display", info: "Info", *args, **kwargs):
+    def __init__(
+        self, display: "Display", info: "Info", window: "MainWindow", *args, **kwargs
+    ):
         super().__init__(*args, **kwargs)
 
         self._gridMask = [
@@ -37,6 +40,7 @@ class ButtonsGrid(QGridLayout):
 
         self.display = display
         self.info = info
+        self.window = window
         self._equation = ""
         self._equationInitialValue = "Sua conta"
         self._left = None
@@ -119,6 +123,7 @@ class ButtonsGrid(QGridLayout):
         self.display.clear()
 
         if not IsValidNumber(displayText) and self._left is None:
+            self._showError("Você não digitou nada.")
             return
 
         if self._left is None:
@@ -131,7 +136,7 @@ class ButtonsGrid(QGridLayout):
         displayText = self.display.text()
 
         if not IsValidNumber(displayText):
-            print("Sem nada a direita")
+            self._showError("Você não digitou o outro número da conta.")
             return
 
         self._right = float(displayText)
@@ -139,19 +144,37 @@ class ButtonsGrid(QGridLayout):
         result = "error"
 
         try:
-            if "^" == self.equation and isinstance(self._left, float):
+            if "^" in self.equation and isinstance(self._left, float):  # type: ignore
                 result = math.pow(self._left, self._right)
             else:
                 result = eval(self.equation)
 
         except ZeroDivisionError:
-            print("Zero Division Error")
+            self._showError("Divisão por 0.")
         except OverflowError:
-            print("Número muito grande")
+            self._showError("Essa conta não pode ser realizada.")
 
         self._left = result
         self.info.setText(f"{self.equation} = {result}")
         self.display.setText(str(result))
 
         if result == "error":
-            print("lascou")
+            self._left = None
+            self._right = None
+            self._operator = None
+            self.display.clear()
+
+    def _showError(self, text):
+        msgBox = self.window.makeMsgBox()
+        msgBox.setText(text)
+        msgBox.setWindowTitle("Error")
+        msgBox.setIcon(msgBox.Icon.Critical)
+        msgBox.setStandardButtons(msgBox.StandardButton.Ok)
+        msgBox.exec()
+
+    def _showInfo(self, text):
+        msgBox = self.window.makeMsgBox()
+        msgBox.setText(text)
+        msgBox.setWindowTitle("Information")
+        msgBox.setIcon(msgBox.Icon.Information)
+        msgBox.exec()
