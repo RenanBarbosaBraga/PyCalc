@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 from PySide6.QtCore import Slot
 from PySide6.QtWidgets import QGridLayout, QPushButton
-from utils import IsEmpty, IsNumOrDot, IsValidNumber
+from utils import IsEmpty, IsNumOrDot, IsValidNumber, convertToNumber
 from variables import MEDIUM_FONT_SIZE
 
 if TYPE_CHECKING:
@@ -127,12 +127,16 @@ class ButtonsGrid(QGridLayout):
         displayText = self.display.text()
         self.display.clear()
 
+        if text == "-" and len(displayText) == 0:
+            self.display.insert(text)
+            return
+
         if not IsValidNumber(displayText) and self._left is None:
             self._showError("Você não digitou nada.")
             return
 
         if self._left is None:
-            self._left = float(displayText)
+            self._left = convertToNumber(displayText)
 
         self._op = text
         self.equation = f"{self._left} {self._op} ??"
@@ -145,15 +149,15 @@ class ButtonsGrid(QGridLayout):
             self._showError("Você não digitou o outro número da conta.")
             return
 
-        self._right = float(displayText)
+        self._right = convertToNumber(displayText)
         self.equation = f"{self._left} {self._op} {self._right}"
         result = "error"
 
         try:
             if "^" in self.equation and isinstance(self._left, float):  # type: ignore
-                result = math.pow(self._left, self._right)
+                result = convertToNumber(math.pow(self._left, self._right))
             else:
-                result = eval(self.equation)
+                result = convertToNumber(eval(self.equation))
 
         except ZeroDivisionError:
             self._showError("Divisão por 0.")
