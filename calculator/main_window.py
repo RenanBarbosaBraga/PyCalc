@@ -13,7 +13,7 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(self.cw)
 
-        self.setWindowTitle("Amo Minha Mulher")
+        self.setWindowTitle("PyCalc")
 
     def adjustFixedSize(self):
         self.adjustSize()

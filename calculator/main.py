@@ -27,8 +27,6 @@ if __name__ == "__main__":
     buttonsGrid = ButtonsGrid(display, info, window)
     window.vLayout.addLayout(buttonsGrid)
 
-    buttonsGrid._makeGrid()
-
     window.adjustFixedSize()
     window.show()
     app.exec()
